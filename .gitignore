@@ -1,0 +1,22 @@
+# Generated backup archives
+backups/*.tar.gz
+
+# Runtime logs
+logs/*.log
+logs/*.log-*
+
+# Generated health reports
+reports/*.txt
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Environment files
+.env
+.env.*
+
+# Python artifacts
+__pycache__/
+*.pyc
