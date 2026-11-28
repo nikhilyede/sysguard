@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070c11">
+  <title>SysGuard | Linux Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <a class="brand" href="#overview">
+      <span class="brand-mark">SG</span>
+      <span>SYSGUARD<small>LINUX OPERATIONS</small></span>
+    </a>
+    <div class="top-actions">
+      <span id="connection" class="connection"><i></i> Public snapshot</span>
+      <button class="btn" id="theme" type="button">☼ Theme</button>
+      <a class="btn primary" href="https://github.com/nikhilyede/sysguard" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">DEVOPS · LINUX · BASH AUTOMATION</div>
+    <h1>Monitor. Detect.<br><em>Recover. Automate.</em></h1>
+    <p class="lead">A Linux server monitoring and automation project built with Bash, systemd, cron and logrotate. Monitor system resources, inspect services, recover failures, automate backups and generate health reports.</p>
+    <div class="chips">
+      <span>Ubuntu Linux</span><span>Bash</span><span>systemd</span>
+      <span>Nginx</span><span>OpenSSH</span><span>Cron</span>
+      <span>Logrotate</span><span>Tar + Gzip</span>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="SysGuard sections">
+    <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button role="tab" data-tab="monitor" aria-selected="false">Monitor and Recovery</button>
+    <button role="tab" data-tab="backup" aria-selected="false">Backups</button>
+    <button role="tab" data-tab="report" aria-selected="false">Health Report</button>
+    <button role="tab" data-tab="config" aria-selected="false">Config and Usage</button>
+    <button role="tab" data-tab="tests" aria-selected="false">Tests and Roadmap</button>
+  </nav>
+
+  <div class="page-status">
+    <span id="page-status">Waiting for data</span>
+    <span id="last-updated">No refresh yet</span>
+    <button class="text-button" id="refresh" type="button">↻ Refresh current tab</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="panel" id="panel-overview" role="tabpanel">
+    <div class="section-heading">
+      <div><div class="eyebrow">SYSTEM OVERVIEW</div><h2>Host at a glance</h2>
+        <p class="sub">Current measurements and operational status from SysGuard.</p></div>
+      <span class="source-tag" id="overview-source">Awaiting data</span>
+    </div>
+
+    <div class="grid four">
+      <article class="card stat">
+        <div class="stat-label">CPU USAGE</div><strong id="cpu-value">—</strong>
+        <div class="meter"><i id="cpu-bar"></i></div><small id="cpu-detail">Waiting for measurement</small>
+      </article>
+      <article class="card stat">
+        <div class="stat-label">MEMORY USAGE</div><strong id="memory-value">—</strong>
+        <div class="meter"><i id="memory-bar"></i></div><small id="memory-detail">Waiting for measurement</small>
+      </article>
+      <article class="card stat">
+        <div class="stat-label">ROOT DISK USAGE</div><strong id="disk-value">—</strong>
+        <div class="meter"><i id="disk-bar"></i></div><small id="disk-detail">Waiting for measurement</small>
+      </article>
+      <article class="card stat">
+        <div class="stat-label">SERVICES ACTIVE</div><strong id="service-value">—</strong>
+        <div class="stat-foot" id="service-detail">Waiting for service status</div>
+      </article>
+    </div>
+
+    <div class="flow">
+      <div><b>01</b><span>Monitor</span></div><i>→</i>
+      <div><b>02</b><span>Detect</span></div><i>→</i>
+      <div><b>03</b><span>Recover</span></div><i>→</i>
+      <div><b>04</b><span>Automate</span></div>
+    </div>
+
+    <div class="grid two overview-lower">
+      <article class="card">
+        <div class="card-heading"><div><h3>Host information</h3><p>Environment details reported by the agent</p></div></div>
+        <div class="info-list">
+          <div><span>Hostname</span><b id="host-name">—</b></div>
+          <div><span>Operating system</span><b id="host-os">—</b></div>
+          <div><span>Project version</span><b id="project-version">—</b></div>
+          <div><span>System uptime</span><b id="host-uptime">—</b></div>
+          <div><span>Last collection</span><b id="host-timestamp">—</b></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-heading"><div><h3>Service status</h3><p>Live systemd service inspection</p></div>
+          <button class="text-button" data-go="monitor">Inspect →</button></div>
+        <div id="overview-services" class="result-list"><div class="empty">Service data will appear here.</div></div>
+      </article>
+    </div>
+
+    <article class="card section-card">
+      <div class="card-heading"><div><h3>Filesystem inventory</h3><p>Mounted filesystems and current usage</p></div></div>
+      <div id="overview-filesystems" class="table-wrap"><div class="empty">Filesystem data will appear here.</div></div>
+    </article>
+
+    <div class="start-actions">
+      <button class="btn primary" data-go="monitor">Open monitoring →</button>
+      <button class="btn" data-go="backup">Inspect backups →</button>
+      <button class="btn" data-go="report">View reports →</button>
+    </div>
+  </section>
+
+  <!-- MONITOR -->
+  <section class="panel" id="panel-monitor" role="tabpanel" hidden>
+    <div class="section-heading">
+      <div><div class="eyebrow">MONITORING & RECOVERY</div><h2>System resources and services</h2>
+        <p class="sub">Fresh resource measurements and real service states from the Linux host.</p></div>
+      <span class="source-tag" id="monitor-source">Awaiting data</span>
+    </div>
+
+    <div class="grid three">
+      <article class="card gauge-card"><div class="stat-label">CPU UTILIZATION</div>
+        <strong id="monitor-cpu">—</strong><div class="meter"><i id="monitor-cpu-bar"></i></div>
+        <small id="monitor-cpu-note">No measurement loaded</small></article>
+      <article class="card gauge-card"><div class="stat-label">MEMORY UTILIZATION</div>
+        <strong id="monitor-memory">—</strong><div class="meter"><i id="monitor-memory-bar"></i></div>
+        <small id="monitor-memory-note">No measurement loaded</small></article>
+      <article class="card gauge-card"><div class="stat-label">ROOT DISK UTILIZATION</div>
+        <strong id="monitor-disk">—</strong><div class="meter"><i id="monitor-disk-bar"></i></div>
+        <small id="monitor-disk-note">No measurement loaded</small></article>
+    </div>
+
+    <div class="grid two section-gap">
+      <article class="card">
+        <div class="card-heading"><div><h3>Critical services</h3><p>Actual systemd state, not a simulation</p></div>
+          <button class="text-button" id="reload-services">↻ Inspect</button></div>
+        <div id="service-list" class="result-list"><div class="empty">Load service status to begin.</div></div>
+        <p class="note">Restart is an operational action and is only available after connecting to the authenticated local agent.</p>
+      </article>
+      <article class="card">
+        <div class="card-heading"><div><h3>Monitoring operation</h3><p>Run the actual scripts/sysguard.sh script</p></div></div>
+        <p class="body-copy">The monitoring script checks CPU, memory, disk usage and configured services. It may attempt to restart inactive services.</p>
+        <button class="btn primary full" id="run-health" type="button">▶ Run SysGuard health check</button>
+        <div class="note warning">This executes the real monitoring script. Confirm before running because service recovery may restart an inactive service.</div>
+      </article>
+    </div>
+
+    <article class="card terminal-card">
+      <div class="terminal-head"><div class="terminal-dots"><i></i><i></i><i></i></div><span>sysguard@linux · operation output</span><span id="monitor-operation-state">IDLE</span></div>
+      <pre id="monitor-output" class="terminal-output">Select an operation to display its actual output here.</pre>
+    </article>
+
+    <article class="card section-card">
+      <div class="card-heading"><div><h3>Monitoring logs</h3><p>Latest available SysGuard log entries</p></div>
+        <button class="text-button" id="load-logs">Load logs ↻</button></div>
+      <pre id="monitor-logs" class="log-output">Logs have not been loaded.</pre>
+    </article>
+  </section>
+
+  <!-- BACKUPS -->
+  <section class="panel" id="panel-backup" role="tabpanel" hidden>
+    <div class="section-heading">
+      <div><div class="eyebrow">BACKUP MANAGEMENT</div><h2>Archives and retention</h2>
+        <p class="sub">Inspect actual backup files and run the project backup script.</p></div>
+      <span class="source-tag" id="backup-source">Awaiting data</span>
+    </div>
+    <div class="grid three">
+      <article class="card stat"><div class="stat-label">ARCHIVES FOUND</div><strong id="backup-count">—</strong><small>Files in the configured backup directory</small></article>
+      <article class="card stat"><div class="stat-label">RETENTION POLICY</div><strong id="backup-retention">—</strong><small>Days configured for backup retention</small></article>
+      <article class="card stat"><div class="stat-label">BACKUP DIRECTORY</div><strong class="path-value" id="backup-directory">—</strong><small>Resolved by the backend agent</small></article>
+    </div>
+    <article class="card section-card">
+      <div class="card-heading"><div><h3>Backup archive inventory</h3><p>Files discovered on the host</p></div>
+        <button class="text-button" id="reload-backups">↻ Refresh list</button></div>
+      <div id="backup-list" class="table-wrap"><div class="empty">Backup inventory will appear here.</div></div>
+    </article>
+    <div class="grid two section-gap">
+      <article class="card">
+        <h3>Create a backup</h3>
+        <p class="body-copy">Execute the real scripts/backup.sh script. The operation result and command output will be displayed.</p>
+        <button class="btn primary full" id="run-backup" type="button">▶ Run backup.sh</button>
+        <p class="note">The current script archives the SysGuard project directory. It does not yet archive the configured /var/log and /var/www/html paths.</p>
+      </article>
+      <article class="card terminal-card">
+        <div class="terminal-head"><div class="terminal-dots"><i></i><i></i><i></i></div><span>backup.sh · execution output</span></div>
+        <pre id="backup-output" class="terminal-output">Backup operation output will appear here.</pre>
+      </article>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="panel" id="panel-report" role="tabpanel" hidden>
+    <div class="section-heading">
+      <div><div class="eyebrow">HEALTH REPORTING</div><h2>Reports and diagnostics</h2>
+        <p class="sub">Browse existing health reports or generate a fresh report from the Linux host.</p></div>
+      <span class="source-tag" id="report-source">Awaiting data</span>
+    </div>
+    <div class="grid two">
+      <article class="card">
+        <div class="card-heading"><div><h3>Generated reports</h3><p>Files found in reports/</p></div>
+          <button class="text-button" id="reload-reports">↻ Refresh</button></div>
+        <div id="report-list" class="result-list"><div class="empty">Report inventory will appear here.</div></div>
+      </article>
+      <article class="card">
+        <h3>Generate a health report</h3>
+        <p class="body-copy">Execute scripts/health-report.sh. The generated report will be displayed after successful completion.</p>
+        <button class="btn primary full" id="run-report" type="button">▶ Generate health report</button>
+        <div class="note">The report is generated by the actual Bash script and saved in the project's reports directory.</div>
+      </article>
+    </div>
+    <article class="card terminal-card section-gap">
+      <div class="terminal-head"><div class="terminal-dots"><i></i><i></i><i></i></div><span>health-report.sh · report contents</span></div>
+      <pre id="report-output" class="terminal-output">Select a report or generate a new one to view its contents.</pre>
+    </article>
+  </section>
+
+  <!-- CONFIG -->
+  <section class="panel" id="panel-config" role="tabpanel" hidden>
+    <div class="section-heading">
+      <div><div class="eyebrow">PROJECT CONFIGURATION</div><h2>Config and usage</h2>
+        <p class="sub">Inspect the live configuration and connect to the authenticated local dashboard agent.</p></div>
+      <span class="source-tag" id="config-source">Read-only until connected</span>
+    </div>
+    <div class="grid two">
+      <article class="card">
+        <h3>Agent connection</h3>
+        <p class="body-copy">Pair this browser once with your local WSL agent. The session is then remembered securely by the browser.</p>
+        <label class="field-label" for="pair-code">One-time pairing code</label>
+        <input class="field" id="pair-code" type="password" autocomplete="one-time-code" placeholder="Generate a code in your WSL terminal">
+        <div class="button-row">
+          <button class="btn primary" id="pair-agent" type="button">Pair local agent</button>
+        </div>
+        <p class="note">In WSL, run <code>./scripts/agent-pair</code>. The code expires after five minutes and can only be used once.</p>
+        <details>
+          <summary>Advanced API-token connection</summary>
+          <label class="field-label" for="api-url">API base URL</label>
+          <input class="field" id="api-url" type="url" placeholder="http://127.0.0.1:8765">
+          <label class="field-label" for="api-token">API access token</label>
+          <input class="field" id="api-token" type="password" autocomplete="off" placeholder="Enter API token">
+          <div class="button-row">
+            <button class="btn primary" id="connect-api" type="button">Connect and verify</button>
+            <button class="btn" id="disconnect-api" type="button">Disconnect</button>
+          </div>
+          <p class="note">The API token is kept in page memory only, never browser storage.</p>
+        </details>
+      </article>
+      <article class="card">
+        <div class="card-heading"><div><h3>Threshold configuration</h3><p>Values read from config/sysguard.conf</p></div></div>
+        <div class="config-fields">
+          <label>CPU threshold (%)<input id="cfg-cpu" type="number" min="1" max="100" value="80"></label>
+          <label>Memory threshold (%)<input id="cfg-memory" type="number" min="1" max="100" value="80"></label>
+          <label>Disk threshold (%)<input id="cfg-disk" type="number" min="1" max="100" value="80"></label>
+          <label>Backup retention (days)<input id="cfg-retention" type="number" min="1" max="365" value="7"></label>
+        </div>
+        <button class="btn primary full" id="save-config" type="button">Save configuration to Linux host</button>
+        <pre id="config-output" class="config-preview">Connect to the local agent to read the actual configuration.</pre>
+      </article>
+    </div>
+    <article class="card section-card">
+      <h3>Common Linux commands</h3>
+      <p class="sub">Useful commands for operating and inspecting the project.</p>
+      <div id="command-list" class="command-list"></div>
+    </article>
+  </section>
+
+  <!-- TESTS -->
+  <section class="panel" id="panel-tests" role="tabpanel" hidden>
+    <div class="section-heading">
+      <div><div class="eyebrow">VALIDATION & DEVELOPMENT</div><h2>Tests and roadmap</h2>
+        <p class="sub">Check the actual dashboard API endpoints and review planned improvements.</p></div>
+      <span class="source-tag" id="tests-source">Not tested yet</span>
+    </div>
+    <article class="card">
+      <div class="card-heading"><div><h3>Dashboard API checks</h3><p>Each result is obtained by making a real HTTP request.</p></div>
+        <button class="btn primary" id="run-tests" type="button">Run endpoint tests</button></div>
+      <div id="test-results" class="test-results"><div class="empty">Run the checks to inspect endpoint availability.</div></div>
+    </article>
+    <h2 class="roadmap-heading">Project roadmap</h2>
+    <p class="sub">Planned improvements, not features claimed as completed.</p>
+    <div class="grid four">
+      <article class="card roadmap"><span>01</span><h3>Email alerts</h3><p>Notify administrators about critical events.</p></article>
+      <article class="card roadmap"><span>02</span><h3>HTML reports</h3><p>Browser-friendly report exports.</p></article>
+      <article class="card roadmap"><span>03</span><h3>Trend tracking</h3><p>Persistent CPU and memory history.</p></article>
+      <article class="card roadmap"><span>04</span><h3>Configurable services</h3><p>Choose monitored systemd services.</p></article>
+      <article class="card roadmap"><span>05</span><h3>Backup sources</h3><p>Support configurable backup paths.</p></article>
+      <article class="card roadmap"><span>06</span><h3>AWS S3</h3><p>Optional off-host backup storage.</p></article>
+      <article class="card roadmap"><span>07</span><h3>Docker</h3><p>Containerized deployment option.</p></article>
+      <article class="card roadmap"><span>08</span><h3>Prometheus</h3><p>Metrics integration and visualization.</p></article>
+    </div>
+  </section>
+
+  <footer>
+    <span>SysGuard · Linux server monitoring and automation</span>
+    <span>Built with Bash, Python and Flask</span>
+    <a href="https://github.com/nikhilyede/sysguard" target="_blank" rel="noopener">GitHub repository ↗</a>
+  </footer>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="./assets/app.js" defer></script>
+</body>
+</html>

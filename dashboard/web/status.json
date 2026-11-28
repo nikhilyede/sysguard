@@ -1,0 +1,119 @@
+{
+  "timestamp": "2026-11-28T17:05:14.148126+00:00",
+  "hostname": "SysGuard Linux host",
+  "operating_system": "Ubuntu 26.04.1 LTS",
+  "metrics": {
+    "cpu": 0.2,
+    "memory": 45.1,
+    "disk": {
+      "mount": "/",
+      "used_percent": 1.0
+    },
+    "filesystems": [
+      {
+        "filesystem": "Linux filesystem",
+        "mount": "/",
+        "type": "Linux",
+        "used_percent": 1.0
+      }
+    ],
+    "uptime_seconds": 34687.36
+  },
+  "thresholds": {
+    "cpu": 80,
+    "memory": 80,
+    "disk": 80,
+    "backup_retention_days": 7,
+    "services": [
+      "ssh",
+      "nginx"
+    ]
+  },
+  "services": [
+    {
+      "name": "ssh",
+      "state": "active",
+      "return_code": 0
+    },
+    {
+      "name": "nginx",
+      "state": "active",
+      "return_code": 0
+    }
+  ],
+  "backups": [
+    {
+      "name": "sysguard_backup_2026-11-28_16-45-05.tar.gz",
+      "size_bytes": 36977,
+      "modified": "2026-11-28T16:45:05.644466+00:00"
+    },
+    {
+      "name": "sysguard_backup_2026-11-28_15-10-19.tar.gz",
+      "size_bytes": 35072,
+      "modified": "2026-11-28T15:10:19.540123+00:00"
+    },
+    {
+      "name": "sysguard_backup_2026-11-25_21-55-09.tar.gz",
+      "size_bytes": 5751,
+      "modified": "2026-11-25T21:55:09.531911+00:00"
+    },
+    {
+      "name": "sysguard_backup_2026-11-25_21-34-01.tar.gz",
+      "size_bytes": 4244,
+      "modified": "2026-11-25T21:34:01.354311+00:00"
+    },
+    {
+      "name": "sysguard_backup_2026-11-25_21-33-01.tar.gz",
+      "size_bytes": 4212,
+      "modified": "2026-11-25T21:33:01.250197+00:00"
+    },
+    {
+      "name": "sysguard_backup_2026-11-25_21-32-01.tar.gz",
+      "size_bytes": 4144,
+      "modified": "2026-11-25T21:32:01.134081+00:00"
+    },
+    {
+      "name": "sysguard_backup_2026-11-25_21-25-34.tar.gz",
+      "size_bytes": 4075,
+      "modified": "2026-11-25T21:25:34.393338+00:00"
+    },
+    {
+      "name": "sysguard_backup_2026-11-25_21-17-19.tar.gz",
+      "size_bytes": 4024,
+      "modified": "2026-11-25T21:17:19.128382+00:00"
+    }
+  ],
+  "reports": [
+    {
+      "name": "health_report_2026-11-28_16-45-18.txt",
+      "size_bytes": 1436,
+      "modified": "2026-11-28T16:45:19.974454+00:00"
+    },
+    {
+      "name": "health_report_2026-11-28_15-10-19.txt",
+      "size_bytes": 1480,
+      "modified": "2026-11-28T15:10:20.944123+00:00"
+    },
+    {
+      "name": "health_report_2026-11-25_22-34-54.txt",
+      "size_bytes": 1436,
+      "modified": "2026-11-25T22:34:55.241486+00:00"
+    },
+    {
+      "name": "health_report_2026-11-25_21-50-19.txt",
+      "size_bytes": 1480,
+      "modified": "2026-11-25T21:50:20.959614+00:00"
+    },
+    {
+      "name": "health_report_2026-11-25_21-44-34.txt",
+      "size_bytes": 917,
+      "modified": "2026-11-25T21:44:36.071166+00:00"
+    }
+  ],
+  "logs": [],
+  "warnings": [],
+  "project_version": "1.0",
+  "public_snapshot": true,
+  "snapshot_generated_at": "2026-11-28T17:05:14.550009+00:00",
+  "snapshot_note": "Read-only snapshot. Live Linux operations require the authenticated local agent."
+}

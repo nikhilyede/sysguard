@@ -20,3 +20,15 @@ reports/*.txt
 # Python artifacts
 __pycache__/
 *.pyc
+
+# Private runtime data
+backups/*
+!backups/.gitkeep
+logs/*
+!logs/.gitkeep
+reports/*
+!reports/.gitkeep
+
+# Local agent credentials and temporary documentation
+*.bak
+docs/*.previous.md

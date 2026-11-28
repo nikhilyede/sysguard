@@ -1,88 +1,112 @@
-# SysGuard – System Architecture
+# SysGuard Architecture
 
 ## 1. Overview
 
-SysGuard is a Bash-based Linux server monitoring and automation tool. It monitors system resources, checks critical services, attempts automatic service recovery, manages backups, and generates health reports.
+SysGuard combines Bash-based Linux monitoring and automation with an optional Flask dashboard agent.
 
-## 2. Architecture Diagram
+The project has two operating layers:
+
+1. Linux automation scripts that perform monitoring, recovery, backup, and reporting.
+2. A local dashboard agent that exposes authenticated system information and approved operations to the browser.
+
+## 2. Architecture
 
 ```mermaid
 flowchart TD
-    A[Linux Server - Ubuntu] --> B[SysGuard]
+    A[Linux Host] --> B[SysGuard CLI]
+    B --> C[Monitoring Scripts]
+    B --> D[Backup Script]
+    B --> E[Health Report Script]
+    B --> F[Dashboard Agent Setup]
 
-    B --> C[System Monitoring]
-    B --> D[Backup Management]
-    B --> E[Health Reporting]
+    C --> G[CPU / RAM / Disk]
+    C --> H[SSH / Nginx]
+    H --> I[Service Recovery]
 
-    C --> F[CPU Monitoring]
-    C --> G[Memory Monitoring]
-    C --> H[Disk Monitoring]
-    C --> I[Service Monitoring]
+    D --> J[Tar / Gzip Archives]
+    K[Cron] --> D
 
-    I --> J[SSH Service]
-    I --> K[Nginx Service]
+    F --> L[systemd Service]
+    L --> M[Flask API]
+    M --> N[Browser Dashboard]
 
-    J --> L[Automatic Recovery]
-    K --> L
-
-    D --> M[Tar and Gzip]
-    M --> N[Timestamped Backups]
-    O[Cron Scheduler] --> D
-
-    E --> P[System Metrics]
-    E --> Q[Service Status]
-    P --> R[Health Report]
-    Q --> R
-
-    C --> S[Log Files]
-    D --> S
-    S --> T[Logrotate]
+    N --> O[Authenticated Local API]
+    O --> C
+    O --> D
+    O --> E
 ```
-## 3. Main Components
+
+## 3. Main components
 
 | Component | Responsibility |
 |---|---|
-| sysguard.sh | Monitors CPU, RAM, disk and services |
-| backup.sh | Creates compressed project backups |
-| health-report.sh | Generates system health reports |
-| sysguard.conf | Stores monitoring thresholds and settings |
-| Cron | Schedules automated backups |
-| Logrotate | Rotates and manages log files |
-| systemd | Checks and restarts Linux services |
+| `sysguard` | User-facing command-line interface |
+| `install.sh` | Installs the CLI command |
+| `scripts/sysguard.sh` | Monitors resources and services |
+| `scripts/backup.sh` | Creates compressed project backups |
+| `scripts/health-report.sh` | Generates system health reports |
+| `scripts/agent-pair` | Generates one-time browser pairing codes |
+| `config/sysguard.conf` | Monitoring and backup configuration |
+| `dashboard/agent/app.py` | Flask API and authenticated operations |
+| `dashboard/web/` | Browser dashboard |
+| `dashboard/agent/publish_snapshot.py` | Publishes a read-only dashboard snapshot |
+| systemd | Runs the local dashboard agent |
+| Cron | Schedules backups |
+| Logrotate | Rotates application logs |
 
-## 4. Monitoring Workflow
+## 4. Authentication and browser pairing
 
-1. SysGuard loads its configuration.
-2. CPU utilization is measured.
-3. Memory utilization is calculated.
-4. Disk usage is checked against configured thresholds.
-5. SSH and Nginx service states are checked.
-6. If a monitored service is inactive, SysGuard attempts to restart it.
-7. Monitoring activities are recorded in log files.
+The dashboard agent uses local browser pairing.
 
-## 5. Backup Workflow
+1. The user runs `sysguard agent pair`.
+2. A cryptographically random, single-use code is generated.
+3. The code expires after five minutes.
+4. The browser submits the code to the local pairing endpoint.
+5. The backend validates the code and creates an authenticated browser session.
+6. The pairing file is deleted after successful use.
 
-1. Cron triggers the backup script at the scheduled time.
+The API is configured to listen on localhost. The dashboard agent should not be exposed directly to the public internet.
+
+## 5. Dashboard operating modes
+
+### Local mode
+
+The local browser connects to the user's own Linux agent. Authenticated API requests retrieve live information and can execute approved SysGuard operations.
+
+### Public snapshot mode
+
+A static published snapshot can be displayed by a public website. It is read-only and cannot execute commands on a visitor's computer.
+
+A public GitHub Pages deployment and a local Linux agent serve different purposes.
+
+## 6. Monitoring workflow
+
+1. Load the SysGuard configuration.
+2. Measure CPU utilization.
+3. Calculate memory utilization.
+4. Inspect filesystem usage.
+5. Check configured services.
+6. Attempt recovery if a monitored service is inactive.
+7. Record monitoring activity in logs.
+
+## 7. Backup workflow
+
+1. Cron or the user starts the backup script.
 2. The script creates a timestamped compressed archive of the SysGuard project.
-3. Existing backup archives are retained according to the configured retention period.
-4. Older archives are deleted.
+3. Archives older than the configured retention period are removed.
+4. Backup activity is logged.
 
-**Note:** The current backup script archives the SysGuard project itself. It does not yet back up `/var/log` or `/var/www/html`.
+**Current scope:** the backup script archives the SysGuard project directory. The configured `BACKUP_SOURCES` entries are not currently included in the archive.
 
-## 6. Technology Stack
+## 8. Security considerations
 
-- Ubuntu Linux
-- Bash Shell Scripting
-- systemd
-- Cron
-- Logrotate
-- Tar and Gzip
-- Git and GitHub
+- Local API binding uses loopback.
+- Browser pairing codes are single-use and time-limited.
+- API and session secrets are stored outside the Git repository.
+- The dashboard uses authenticated sessions for browser operations.
+- Service restart operations are restricted to configured services.
+- The dashboard does not provide an unrestricted shell endpoint.
 
-## 7. Future Enhancements
+## 9. Platform notes
 
-- AWS S3 backup integration
-- Email alert notifications
-- HTML health reports
-- Prometheus and Grafana monitoring
-- Docker deployment
+The project is developed and tested on Ubuntu under WSL2. systemd services and cron jobs require the WSL distribution to be running.

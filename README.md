@@ -1,204 +1,144 @@
-# SysGuard – Linux Server Monitoring & Automated Recovery
+# SysGuard — Linux Monitoring, Recovery & Operations Dashboard
 
 ![Linux](https://img.shields.io/badge/OS-Linux-orange?logo=linux)
-![Shell](https://img.shields.io/badge/Language-Bash-green?logo=gnubash)
+![Bash](https://img.shields.io/badge/Language-Bash-green?logo=gnubash)
+![Python](https://img.shields.io/badge/API-Python%20%2F%20Flask-blue?logo=python)
 ![Platform](https://img.shields.io/badge/Platform-Ubuntu-blue?logo=ubuntu)
-![Project](https://img.shields.io/badge/Project-DevOps-purple)
 
-## Overview
+SysGuard is a Linux monitoring and automation project with a browser-based operations dashboard. It monitors system resources, checks critical services, attempts service recovery, creates compressed backups, and generates health reports.
 
-SysGuard is a Bash-based Linux server monitoring and automation project designed to monitor system resources, check critical services, recover failed services, automate backups, and generate system health reports.
-
-The project demonstrates practical Linux administration, Bash scripting, system monitoring, scheduled automation, backup management, and service recovery.
+The project combines Bash scripting, Python/Flask, systemd, cron, and Linux administration.
 
 ## Features
 
-- **CPU Monitoring:** Measures CPU utilization and checks configurable thresholds.
-- **Memory Monitoring:** Tracks RAM utilization.
-- **Disk Monitoring:** Checks filesystem usage and identifies high disk utilization.
-- **Service Monitoring:** Monitors SSH and Nginx services.
-- **Automatic Recovery:** Attempts to restart inactive critical services.
-- **Automated Backups:** Creates timestamped compressed project backups.
-- **Backup Retention:** Removes backup archives older than the configured retention period.
-- **Log Management:** Records monitoring and backup activity.
-- **Log Rotation:** Uses Linux logrotate to manage log files.
-- **Health Reports:** Generates timestamped reports containing system metrics and service status.
-- **Cron Scheduling:** Supports scheduled automated backups.
+- CPU, memory, and filesystem monitoring
+- SSH and Nginx service monitoring
+- Automatic recovery attempts for inactive monitored services
+- Timestamped compressed project backups
+- Configurable backup retention
+- System health report generation
+- Cron-based scheduled backups
+- Log management and logrotate integration
+- Local Flask dashboard agent
+- One-time browser pairing and authenticated sessions
+- Read-only public snapshot support
+- CLI for common operations and agent management
 
-## Technologies Used
+## Dashboard
 
-| Technology | Purpose |
-|---|---|
-| Ubuntu Linux | Operating environment |
-| Bash | Automation and scripting |
-| Linux commands | System monitoring |
-| systemd | Service management |
-| Nginx | Monitored web service |
-| OpenSSH | Monitored SSH service |
-| Cron | Scheduled backups |
-| Logrotate | Log management |
-| Tar and Gzip | Backup compression |
-| Git and GitHub | Version control |
+The dashboard provides six operational areas:
 
-## Project Structure
+1. Overview
+2. Monitor and Recovery
+3. Backups
+4. Health Report
+5. Config and Usage
+6. Tests and Roadmap
 
-```text
-sysguard/
-├── config/
-│   └── sysguard.conf
-├── scripts/
-│   ├── sysguard.sh
-│   ├── backup.sh
-│   └── health-report.sh
-├── logs/
-├── backups/
-├── reports/
-├── docs/
-├── README.md
-└── .gitignore
+The local dashboard retrieves data from the user's Linux agent. Buttons that perform operations require an authenticated local connection.
+
+A public static deployment can show a published read-only snapshot. GitHub Pages cannot execute scripts on a visitor's Linux system.
+
+## Quick start
+
+```bash
+git clone https://github.com/nikhilyede/sysguard.git
+cd sysguard
+
+chmod +x install.sh
+./install.sh
+
+sysguard agent setup
+sysguard agent pair
+sysguard dashboard open
+```
+
+See [Installation Guide](docs/installation.md) for details.
+
+## CLI commands
+
+```bash
+sysguard help
+sysguard monitor
+sysguard backup
+sysguard report
+
+sysguard agent status
+sysguard agent start
+sysguard agent stop
+sysguard agent restart
+sysguard agent pair
+
+sysguard dashboard open
+sysguard dashboard url
 ```
 
 ## Configuration
 
-Edit `config/sysguard.conf` to customize monitoring thresholds.
+Edit `config/sysguard.conf` to configure monitoring thresholds and retention.
 
 ```bash
 CPU_THRESHOLD=80
 MEMORY_THRESHOLD=80
 DISK_THRESHOLD=80
-
 BACKUP_RETENTION_DAYS=7
-BACKUP_DIR="backups"
-
-LOG_FILE="logs/sysguard.log"
-
 SERVICES=("ssh" "nginx")
 ```
 
-## Installation
+## Technology stack
 
-Clone the repository:
-
-```bash
-git clone https://github.com/nikhilyede/sysguard.git
-cd sysguard
-```
-
-Make scripts executable:
-
-```bash
-chmod +x scripts/*.sh
-```
-
-Install the required utilities if they are not already installed:
-
-```bash
-sudo apt update
-sudo apt install nginx openssh-server cron logrotate -y
-```
-
-## Usage
-
-### 1. Run system monitoring
-
-```bash
-./scripts/sysguard.sh
-```
-
-### 2. Run automated backup
-
-```bash
-./scripts/backup.sh
-```
-
-### 3. Generate system health report
-
-```bash
-./scripts/health-report.sh
-```
-
-### 4. View monitoring logs
-
-```bash
-tail -f logs/sysguard.log
-```
-
-### 5. View generated backups
-
-```bash
-ls -lh backups/
-```
-
-### 6. View health reports
-
-```bash
-ls -lh reports/
-```
-
-## Automated Backup Scheduling
-
-SysGuard supports scheduled backups through cron.
-
-Example: Run a backup every day at 2:00 AM.
-
-```cron
-0 2 * * * /bin/bash /home/USER/sysguard/scripts/backup.sh >> /home/USER/sysguard/logs/cron-backup.log 2>&1
-```
-
-Replace `USER` with your Linux username.
-
-## Log Rotation
-
-SysGuard uses logrotate to manage monitoring and backup logs.
-
-Configured policies include:
-
-- Daily rotation
-- Seven rotated copies
-- Gzip compression
-- Missing-file handling
-- Empty-file exclusion
-
-## Testing and Validation
-
-The following tests were performed during development:
-
-| Test | Result |
+| Technology | Purpose |
 |---|---|
-| CPU monitoring | Passed |
-| RAM monitoring | Passed |
-| Disk monitoring | Passed |
-| SSH service monitoring | Passed |
-| Nginx service monitoring | Passed |
-| Nginx failure simulation | Passed |
-| Automatic Nginx recovery | Passed |
-| Backup archive creation | Passed |
-| Backup archive inspection | Passed |
-| Configuration file restoration | Passed |
-| Log rotation | Passed |
-| Health report generation | Passed |
+| Ubuntu Linux | Operating environment |
+| Bash | Monitoring and automation |
+| Python and Flask | Local dashboard API |
+| Gunicorn | Dashboard application server |
+| systemd | Agent service management |
+| Cron | Scheduled backups |
+| Logrotate | Log management |
+| Tar and Gzip | Backup compression |
+| HTML, CSS, JavaScript | Dashboard interface |
+| Git and GitHub | Version control |
 
-## Environment
+## Project structure
 
-Developed and tested in Ubuntu running under Windows Subsystem for Linux (WSL).
+```text
+sysguard/
+├── config/
+│   └── sysguard.conf
+├── dashboard/
+│   ├── agent/
+│   ├── deploy/
+│   └── web/
+├── docs/
+│   ├── architecture.md
+│   └── installation.md
+├── scripts/
+│   ├── agent-pair
+│   ├── backup.sh
+│   ├── health-report.sh
+│   └── sysguard.sh
+├── sysguard
+├── install.sh
+└── README.md
+```
 
-**Note:** WSL must be running for its scheduled cron jobs to execute. The current backup script archives the SysGuard project itself; it does not yet back up the configured `/var/log` and `/var/www/html` source directories.
+## Backup scope
 
-## Future Improvements
+The current backup script archives the SysGuard project directory itself. It does not yet include the configured `/var/log` and `/var/www/html` source directories.
 
-- Email notifications for critical alerts
-- HTML-based health reports
-- CPU and memory trend tracking
-- Configurable service monitoring
-- Configurable backup source directories
-- Cloud backup integration with AWS S3
-- Docker-based deployment
-- Prometheus and Grafana integration
+## Platform notes
+
+Developed and tested on Ubuntu under Windows Subsystem for Linux 2. The local agent and scheduled tasks require the WSL distribution to be running.
+
+## Documentation
+
+- [Installation Guide](docs/installation.md)
+- [System Architecture](docs/architecture.md)
 
 ## Author
 
 **Nikhil Yede**
-
 Aspiring AWS and DevOps Engineer
 
 GitHub: https://github.com/nikhilyede
@@ -207,4 +147,4 @@ Portfolio: https://nikhilyede.github.io/
 
 ---
 
-*SysGuard – Monitor. Detect. Recover. Automate.*
+*SysGuard — Monitor. Detect. Recover. Automate.*

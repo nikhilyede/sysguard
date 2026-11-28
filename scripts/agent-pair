@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+PROJECT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+PAIRING_FILE="$PROJECT_DIR/logs/.agent-pairing.json"
+
+mkdir -p "$PROJECT_DIR/logs"
+chmod 700 "$PROJECT_DIR/logs"
+
+CODE="$(python3 - "$PAIRING_FILE" <<'PY'
+import json
+import secrets
+import sys
+import time
+from pathlib import Path
+
+path = Path(sys.argv[1])
+record = {
+    "code": secrets.token_urlsafe(9),
+    "expires_at": time.time() + 300,
+}
+temporary = path.with_suffix(".tmp")
+temporary.write_text(json.dumps(record))
+temporary.chmod(0o600)
+temporary.replace(path)
+print(record["code"])
+PY
+)"
+
+echo
+echo "SysGuard browser pairing code"
+echo "============================="
+echo "$CODE"
+echo
+echo "Open the local dashboard at:"
+echo "http://127.0.0.1:8765"
+echo
+echo "The code expires in 5 minutes and can only be used once."
+echo "Do not share this code with anyone."

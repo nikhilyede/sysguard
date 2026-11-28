@@ -1,0 +1,23 @@
+[Unit]
+Description=SysGuard Dashboard API
+After=network.target
+
+[Service]
+Type=simple
+User=nikhil
+WorkingDirectory=/home/nikhil/sysguard/dashboard/agent
+Environment=SYSGUARD_HOME=/home/nikhil/sysguard
+Environment=SYSGUARD_BIND_HOST=127.0.0.1
+Environment=SYSGUARD_PORT=8765
+EnvironmentFile=/etc/sysguard-dashboard.env
+ExecStart=/home/nikhil/.venvs/sysguard-dashboard/bin/gunicorn --workers 2 --bind 127.0.0.1:8765 app:app
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/nikhil/sysguard/logs /home/nikhil/sysguard/backups /home/nikhil/sysguard/reports
+
+[Install]
+WantedBy=multi-user.target
